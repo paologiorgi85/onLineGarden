@@ -16,12 +16,8 @@ We start with simple examples and my expectations are to grow up and realize a c
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Copy the folder into your Arduino library and start to modify and contribute to the Repo.
+
 
 ### Contribution guidelines ###
 

@@ -12,19 +12,14 @@
 /* Each day it reload the planned scheduling in order to retrieve all possible updates. */
 /* For this reason, please do not insert any schedule at hour: 00:00.                   */
 /*                                                                                      */
+/* The scheduling are retrieved from a Real time DataBase (Firebase) by Json objcet     */
+/*                                                                                      */
 /* This example code is in the public domain.                                           */
 /* Athor: P. Giorgi                                                                     */
 /****************************************************************************************/
 
-/* Fix: la prima chimata al metodo refreshScheduling() funziona
-/*      la seconda e le successive restituiscono errore:
-/*          "parseObject() failed"  
-/*               CONTROLLARE!!!                       */
-
 #include <Process.h>
 #include <ArduinoJson.h>
-
-StaticJsonBuffer<200> jsonBuffer;
   
 // Variables
 int numOfScheduling = 0;
@@ -48,35 +43,6 @@ void setup() {
   // Inizialize Scheduling
   refreshScheduling();
 
-}
-
-void loop() {
-  Process date;
-  int hours, minutes, seconds;
-  int lastSecond = -1;
-  date.begin("date");
-  date.addParameter("+%T");
-  date.run();
-  if(date.available()>0) {
-    String timeString = date.readString();
-    int firstColon = timeString.indexOf(":");
-    int secondColon= timeString.lastIndexOf(":");
-    String hourString = timeString.substring(0, firstColon); 
-    String minString = timeString.substring(firstColon+1, secondColon);
-    String secString = timeString.substring(secondColon+1);
-    Serial.print("Actual hour: ");
-    Serial.print(hourString);
-    Serial.print(":");
-    Serial.println(minString);
-    if(hourString.equals("00") && minString.equals("00") ) {
-      Serial.println("It's midnight. Recalculare the Scheduling!");
-      refreshScheduling();
-    } else {
-      Serial.println("It's not midnight. Wait a scheduling.");
-    }
-  } else {
-    Serial.println("WARNING! Hour is not available.");
-  }
 }
 
 void refreshScheduling() {
@@ -131,6 +97,7 @@ void refreshScheduling() {
 /********************************/
 /* 4. analyse the json response */
 /********************************/
+  StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(json);
   
   /* json is like -->{"prima":{"hour":9,"minute":20,"name":"prima","time":60},"seconda":{"hour":10,"minute":30,"name":"seconda","time":30}} */
@@ -173,4 +140,31 @@ void refreshScheduling() {
   Serial.println(" Finish Wait.");
 }
 
-
+void loop() {
+  Process date;
+  int hours, minutes, seconds;
+  int lastSecond = -1;
+  date.begin("date");
+  date.addParameter("+%T");
+  date.run();
+  if(date.available()>0) {
+    String timeString = date.readString();
+    int firstColon = timeString.indexOf(":");
+    int secondColon= timeString.lastIndexOf(":");
+    String hourString = timeString.substring(0, firstColon); 
+    String minString = timeString.substring(firstColon+1, secondColon);
+    String secString = timeString.substring(secondColon+1);
+    Serial.print("Actual hour: ");
+    Serial.print(hourString);
+    Serial.print(":");
+    Serial.println(minString);
+    if(hourString.equals("00") && minString.equals("00") ) {
+      Serial.println("It's midnight. Recalculare the Scheduling!");
+      refreshScheduling();
+    } else {
+      Serial.println("It's not midnight. Wait a scheduling.");
+    }
+  } else {
+    Serial.println("WARNING! Hour is not available.");
+  }
+}

@@ -18,15 +18,23 @@
 /* Athor: P. Giorgi                                                                     */
 /****************************************************************************************/
 
+/*****************************************/
+/* FIX: start scheduling when it's ready */
+/*****************************************/
+
+
 #include <Process.h>
 #include <ArduinoJson.h>
   
 // Variables
+String URL = "https://";
+String firebaseURL = "luminous-heat-4517.firebaseio.com"; /* Substitute with your firebase App*/
 int numOfScheduling = 0;
 int hours, minutes, seconds;
 String hourString;
 String minString;
 String secString;
+String lastMinute = "MM";
 long* hour = 0;
 long* minute = 0;
 long* time = 0;
@@ -37,9 +45,10 @@ void setup() {
 
   // Initialize Serial
   Serial.begin(9600);
-  
   delay(10000);
- 
+  URL.concat(firebaseURL);
+  URL.concat("/scheduling.json");
+
   // Inizialize Scheduling
   refreshScheduling();
 
@@ -52,7 +61,7 @@ void refreshScheduling() {
   Process p;
   p.begin("curl");
   p.addParameter("-k");
-  p.addParameter("https://luminous-heat-4517.firebaseio.com/scheduling.json");
+  p.addParameter(URL);
   p.run();
   
   int i = 0;
@@ -72,7 +81,7 @@ void refreshScheduling() {
   Process p1;
   p1.begin("curl");
   p1.addParameter("-k");
-  p1.addParameter("https://luminous-heat-4517.firebaseio.com/scheduling.json");
+  p1.addParameter(URL);
   p1.run();
   
   while (p1.available()>0) {
@@ -135,8 +144,8 @@ void refreshScheduling() {
     time[z] = schedule["time"];
     z++;
   }
-  Serial.println(" Wait 50sec.");
-  delay(50000);
+  Serial.println(" Wait 10sec.");
+  delay(10000);
   Serial.println(" Finish Wait.");
 }
 
@@ -158,12 +167,25 @@ void loop() {
     Serial.print(hourString);
     Serial.print(":");
     Serial.println(minString);
-    if(hourString.equals("00") && minString.equals("00") ) {
-      Serial.println("It's midnight. Recalculare the Scheduling!");
-      refreshScheduling();
+    if(minString.equals(lastMinute)) {
+    /* Check if the control of scheduling has been already performed for this hour (HH:MM) */
+      Serial.print("It's the same minute (MM-> ");
+      Serial.print(lastMinute);
+      Serial.println("). Wait 10 sec.");
+      delay(10000);
     } else {
-      Serial.println("It's not midnight. Wait a scheduling.");
+      if(hourString.equals("00") && minString.equals("00") ) {
+        /* If it's midnight, the list of scheduling had to be recalculated */
+        Serial.println("It's midnight. Recalculare the Scheduling!");
+        refreshScheduling();
+      } else {
+        /* Check if a scheduling had to start.
+        /* If more than one schedule start, the longer wins. So the duration (sec) is simply calulated with the longest one */
+        Serial.println("Waiting a scheduling.");
+        delay(10000);
+      }
     }
+    lastMinute = minString;
   } else {
     Serial.println("WARNING! Hour is not available.");
   }

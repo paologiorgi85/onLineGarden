@@ -1,3 +1,4 @@
+
 /****************************************************************************************/
 /*                SCHEDULE A JOB                                                        */
 /*                                                                                      */
@@ -18,15 +19,11 @@
 /* Athor: P. Giorgi                                                                     */
 /****************************************************************************************/
 
-/*****************************************/
-/* FIX: start scheduling when it's ready */
-/*****************************************/
-
 
 #include <Process.h>
 #include <ArduinoJson.h>
   
-// Variables
+/* Variables */
 String URL = "https://";
 String firebaseURL = "luminous-heat-4517.firebaseio.com"; /* Substitute with your firebase App*/
 int numOfScheduling = 0;
@@ -35,26 +32,39 @@ String hourString;
 String minString;
 String secString;
 String lastMinute = "MM";
+/* Array that store the scheduling */
 long* hour = 0;
 long* minute = 0;
 long* time = 0;
+/* Define pin */
+int pinLed        = 13;
+int valve         =  4;
+int statusLed     = LOW;
 
 void setup() {
-  // Initialize Bridge
+  /* Initialize Bridge */
   Bridge.begin();
 
-  // Initialize Serial
+  /* Initialize Serial */
   Serial.begin(9600);
   delay(10000);
   URL.concat(firebaseURL);
   URL.concat("/scheduling.json");
-
-  // Inizialize Scheduling
+  
+  /* Configuration I/0 */
+  pinMode(pinLed, OUTPUT);
+  pinMode(valve, OUTPUT);
+  
+  /* Turn Off the valve */
+  closeValve();
+  
+  /* Inizialize Scheduling */
   refreshScheduling();
-
 }
 
 void refreshScheduling() {
+  Serial.println();
+  Serial.println("--> Refresh of Scheduling <--");
 /***************************************************/
 /* 1. curl to identify the lenght of Json response */
 /***************************************************/
@@ -93,14 +103,13 @@ void refreshScheduling() {
 /**************************/
 /* 3. print Json response */
 /**************************/
-  Serial.println("--> Start read <--");
+  Serial.print("  1. Read Json: ");
   int a = 0;
   while (a < jsonLength) {
     Serial.print(json[a]);
     a++;
   }
   Serial.println();
-  Serial.println("--> End read <--");
   Serial.flush();
   
 /********************************/
@@ -108,45 +117,52 @@ void refreshScheduling() {
 /********************************/
   StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(json);
-  
-  /* json is like -->{"prima":{"hour":9,"minute":20,"name":"prima","time":60},"seconda":{"hour":10,"minute":30,"name":"seconda","time":30}} */
+  /* json example: {"first":{"hour":9,"minute":20,"name":"first","time":60},"second":{"hour":10,"minute":30,"name":"second","time":30}} */
   
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
   
-  //Reset the number of scheduling
+  /* Reset the number of scheduling */
   numOfScheduling = 0;
   for (JsonObject::iterator item = root.begin(); item !=root.end(); ++item)
   {
     numOfScheduling++;
   }
-  Serial.print("Nunber of scheduling: ");
+  Serial.print("  2. Nunber of scheduling: ");
   Serial.println(numOfScheduling);
   if (hour != 0) {
     delete [] hour;
     delete [] minute;
     delete [] time;
   }
-  hour = new long [numOfScheduling];
-  minute = new long [numOfScheduling];
-  time = new long [numOfScheduling];
+  hour           = new long [numOfScheduling];
+  minute         = new long [numOfScheduling];
+  time           = new long [numOfScheduling];
   int z = 0;
   for (JsonObject::iterator item = root.begin(); item !=root.end(); ++item)
   {
-    Serial.print("Schedule name: ");
+    Serial.print("     - Schedule name: ");
     Serial.print(item->key);
-    Serial.println("-> ");
+    Serial.print(" -> ");
     JsonObject& schedule = root[item->key].asObject();
-    hour[z] = schedule["hour"];
-    minute[z] = schedule["minute"];
-    time[z] = schedule["time"];
+    hour[z]           = schedule["hour"];
+    minute[z]         = schedule["minute"];
+    time[z]           = schedule["time"];
+    Serial.print(hour[z]);
+    Serial.print(":");
+    Serial.print(minute[z]);
+    Serial.print(" for ");
+    Serial.print(time[z]);
+    Serial.println(" sec.");
     z++;
   }
-  Serial.println(" Wait 10sec.");
+  Serial.println("  3. Wait 10sec.");
   delay(10000);
-  Serial.println(" Finish Wait.");
+  Serial.println("  4. Finish Wait.");
+  Serial.println("--> Refresh of Scheduling Complete <--");
+  Serial.println();
 }
 
 void loop() {
@@ -163,30 +179,80 @@ void loop() {
     String hourString = timeString.substring(0, firstColon); 
     String minString = timeString.substring(firstColon+1, secondColon);
     String secString = timeString.substring(secondColon+1);
-    Serial.print("Actual hour: ");
-    Serial.print(hourString);
-    Serial.print(":");
-    Serial.println(minString);
     if(minString.equals(lastMinute)) {
     /* Check if the control of scheduling has been already performed for this hour (HH:MM) */
-      Serial.print("It's the same minute (MM-> ");
-      Serial.print(lastMinute);
-      Serial.println("). Wait 10 sec.");
+      //Serial.print("It's the same minute (MM-> ");
+      //Serial.print(lastMinute);
+      //Serial.println("). Wait 10 sec.");
       delay(10000);
     } else {
+      Serial.print("--> Check at: ");
+      Serial.print(hourString);
+      Serial.print(":");
+      Serial.println(minString);
       if(hourString.equals("00") && minString.equals("00") ) {
-        /* If it's midnight, the list of scheduling had to be recalculated */
-        Serial.println("It's midnight. Recalculare the Scheduling!");
+        /* If it's midnight, recalculate the list of scheduling */
+        Serial.println("  It's midnight. Recalculare the Scheduling!");
         refreshScheduling();
       } else {
-        /* Check if a scheduling had to start.
+        /* Check if a scheduling had to start. */
         /* If more than one schedule start, the longer wins. So the duration (sec) is simply calulated with the longest one */
-        Serial.println("Waiting a scheduling.");
-        delay(10000);
+        boolean startIrrigation = false;
+        long    duration = 0;
+        for (int i = 0; i < sizeof(hour); i++){
+          ///Serial.print("Schedule");
+          //Serial.print(i);
+          //Serial.print(": ");
+          //Serial.print(String(hour[i]));
+          //Serial.print(":");
+          //Serial.println(String(minute[i]));
+          String hourScheduling = String(hour[i]);
+          String minuteScheduling = String(minute[i]);
+          String valueZero = "0";
+          /* Fix on format of hour and minute */
+          if (hourScheduling.length() == 1) {
+            valueZero.concat(hourScheduling);
+            hourScheduling = valueZero;
+          }
+          valueZero = "0";
+          if (minuteScheduling.length() == 1) {
+            valueZero.concat(minuteScheduling);
+            minuteScheduling = valueZero;
+          }
+          if(hourString.equals(hourScheduling) && minString.equals(minuteScheduling) ) {
+            startIrrigation = true;
+            if(time[i] > duration) {
+              duration = time[i];
+            }
+          }
+        }
+        if(startIrrigation) {
+          Serial.print("  Start Irrigation for ");
+          Serial.print(duration);
+          Serial.println(" sec. !");
+          openValve();
+          delay(duration*1000);
+          closeValve();
+        } else {
+          Serial.println("  No irrigation scheduled for this time.");
+          delay(10000);
+        }
       }
     }
     lastMinute = minString;
   } else {
     Serial.println("WARNING! Hour is not available.");
   }
+}
+
+void openValve() {
+  digitalWrite(pinLed, HIGH);
+  digitalWrite(valve, HIGH);
+  Serial.println("    Open valve");
+}
+
+void closeValve() {
+  digitalWrite(pinLed, LOW);
+  digitalWrite(valve, LOW);
+  Serial.println("    Close valve");
 }

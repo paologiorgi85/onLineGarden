@@ -1,17 +1,26 @@
-/*
-  Running process using Process class. 
-
-1. curl to identify the lenght of Json response
-2. curl to retreive the Json response
-3. print Json response
-4. analyse the json response
-5. Print sysdate
- This example code is in the public domain.
-
- */
+/******************************************************/
+/* Retrieve the Json of scheduling from Firebase      */
+/* using Process class.                               */
+/*                                                    */
+/* 1. curl to identify the lenght of Json response    */
+/* 2. curl to retreive the Json response              */
+/* 3. print Json response                             */
+/* 4. analyse the json response                       */
+/* 5. Print sysdate                                   */
+/*                                                    */
+/*  Note: this sketch start when the user enable      */
+/*        serial monitor                              */
+/*                                                    */
+/*  This example code is in the public domain.        */
+/*   Author: P. Giorgi                                */
+/* ****************************************************/
 
 #include <Process.h>
 #include <ArduinoJson.h>
+
+/* Variables */
+String URL = "https://";
+String firebaseURL = "luminous-heat-4517.firebaseio.com"; /* Substitute with your firebase App*/
 
 void setup() {
   // Initialize Bridge
@@ -24,6 +33,9 @@ void setup() {
  
   // Wait until a Serial Monitor is connected.
   while (!Serial);
+  
+  URL.concat(firebaseURL);
+  URL.concat("/scheduling.json");
 
 /***************************************************/
 /* 1. curl to identify the lenght of Json response */
@@ -31,7 +43,7 @@ void setup() {
   Process p;
   p.begin("curl");
   p.addParameter("-k");
-  p.addParameter("https://luminous-heat-4517.firebaseio.com/scheduling.json");
+  p.addParameter(URL);
   p.run();
   
   int i = 0;
@@ -51,7 +63,7 @@ void setup() {
   Process p1;
   p1.begin("curl");
   p1.addParameter("-k");
-  p1.addParameter("https://luminous-heat-4517.firebaseio.com/scheduling.json");
+  p1.addParameter(URL);
   p1.run();
   
   while (p1.available()>0) {
@@ -63,14 +75,13 @@ void setup() {
 /**************************/
 /* 3. print Json response */
 /**************************/
-  Serial.println("--> Start read <--");
+  Serial.print("  1. Read Json: ");
   int a = 0;
   while (a < jsonLength) {
     Serial.print(json[a]);
     a++;
   }
   Serial.println();
-  Serial.println("--> End read <--");
   Serial.flush();
   
 /********************************/
@@ -78,30 +89,38 @@ void setup() {
 /********************************/
   JsonObject& root = jsonBuffer.parseObject(json);
   
-  /* json is like -->{"prima":{"hour":9,"minute":20,"name":"prima","time":60},"seconda":{"hour":10,"minute":30,"name":"seconda","time":30}} */
+  /* json is like -->{"first":{"hour":9,"minute":20,"name":"first","time":60},"second":{"hour":10,"minute":30,"name":"second","time":30}} */
 
   if (!root.success()) {
     Serial.println("parseObject() failed");
     return;
   }
 
+ /* Reset the number of scheduling */
+  int numOfScheduling = 0;
   for (JsonObject::iterator item = root.begin(); item !=root.end(); ++item)
   {
-    Serial.print("Schedulazione ");
+    numOfScheduling++;
+  }
+  Serial.print("  2. Nunber of scheduling: ");
+  Serial.println(numOfScheduling);
+  
+  for (JsonObject::iterator item = root.begin(); item !=root.end(); ++item)
+  {
+    Serial.print("     - Schedule name: ");
     Serial.print(item->key);
-    Serial.println(": ");
+    Serial.print(" -> ");
     JsonObject& schedule = root[item->key].asObject();
     long hour = schedule["hour"];
     long minute = schedule["minute"];
     long time = schedule["time"];
     
-    Serial.print("Start at: ");
     Serial.print(hour);
     Serial.print(":");
     Serial.print(minute);
-    Serial.print(" - For: ");
+    Serial.print(" for: ");
     Serial.print(time);
-    Serial.println(" sec");
+    Serial.println(" sec.");
   }
   
 /********************************/
@@ -120,7 +139,7 @@ void setup() {
     String hourString = timeString.substring(0, firstColon); 
     String minString = timeString.substring(firstColon+1, secondColon);
     String secString = timeString.substring(secondColon+1);
-    Serial.print("Actual hour: ");
+    Serial.print("  3. Hour: ");
     Serial.print(hourString);
     Serial.print(":");
     Serial.println(minString);

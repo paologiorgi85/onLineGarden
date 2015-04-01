@@ -27,6 +27,7 @@ The Arduino sketch are:
 
 Start from the first example and proceed with the next.
 Copy the folder into your Arduino library and start to modify and contribute to the Repo.
+
 The understanding is easy and there are many ways to improve these sketchs.
 
 ### Contribution guidelines ###

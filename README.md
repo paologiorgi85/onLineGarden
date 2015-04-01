@@ -25,11 +25,9 @@ The Arduino sketch are:
 
 ### How do I get set up? ###
 
-Start from the first example and proceed with the others.
-
-The understanding is easy and there are many ways to improve these sketchs.
-
+Start from the first example and proceed with the next.
 Copy the folder into your Arduino library and start to modify and contribute to the Repo.
+The understanding is easy and there are many ways to improve these sketchs.
 
 ### Contribution guidelines ###
 

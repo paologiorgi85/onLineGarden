@@ -30,6 +30,9 @@ Copy the folder into your Arduino library and start to modify and contribute to 
 
 The understanding is easy and there are many ways to improve these sketchs.
 
+I design the circuit with Fritzing.
+Construct the circuit with the example images present into the folter "prototypes_Fritzing".
+
 ### Contribution guidelines ###
 
 * Writing tests

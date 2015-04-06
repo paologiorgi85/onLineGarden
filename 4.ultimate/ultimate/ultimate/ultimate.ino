@@ -205,7 +205,7 @@ void loop() {
         //Serial.print("It's the same minute (MM-> ");
         //Serial.print(lastMinute);
         //Serial.println("). Wait 10 sec.");
-        delay(10000);
+        delay(1000);
       } else {
         Serial.print("--> Check at: ");
         Serial.print(hourString);

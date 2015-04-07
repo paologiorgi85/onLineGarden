@@ -22,12 +22,13 @@ The Arduino sketch are:
 1. button: start the irrigation with a button plugged in the Arduino board.
 2. jsonPrint: retrieve and print the Json stored on Firebase.
 3. scheduling: retrieve and start the irrigation using the scheduling stored on Firebase.
-4. ultimate: add some improves to the sketch, like reset button.
+4. improvements: add some improves to the sketch, like reset button, double water valve, etc...
 
 ### How do I get set up? ###
 
 Start from the first example and proceed with the next.
 Copy the folder into your Arduino library and start to modify and contribute to the Repo.
+Into each folder there are a sketch and all the schema, realized with Fritzing, to reproduce the circuit.
 
 The understanding is easy and there are many ways to improve these sketchs.
 

@@ -1,3 +1,11 @@
+/******************************************************/
+/*                                                    */
+/* This sketch mange the water valve with a button or */
+/* by URL.                                            */
+/*                                                    */
+/* This example code is in the public domain.         */
+/* Athor: P. Giorgi                                   */
+/******************************************************/
 
 /* Include libraries */
 #include <Bridge.h>
@@ -10,7 +18,7 @@ YunServer server;
 /* Define pin and variables */
 int pinLed        = 13;
 int valve         =  4;
-int botton        =  2;
+int botton        =  7;
 int statusLed     = LOW;
 
 void setup() {

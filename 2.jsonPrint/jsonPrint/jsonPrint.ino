@@ -11,6 +11,10 @@
 /*  Note: this sketch start when the user enable      */
 /*        serial monitor                              */
 /*                                                    */
+/* For this sketch is required only Arduino Yun,      */
+/* connected to the WiFi. No additional fritzing      */
+/* schema is required.                                */
+/*                                                    */
 /*  This example code is in the public domain.        */
 /*   Author: P. Giorgi                                */
 /* ****************************************************/

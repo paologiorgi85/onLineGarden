@@ -12,6 +12,7 @@
 /*                                                                                      */
 /* Each day it reload the planned scheduling in order to retrieve all possible updates. */
 /* For this reason, please do not insert any schedule at hour: 00:00.                   */
+/* To reload the scheduling it's also possible to use the reset button.                 */
 /*                                                                                      */
 /* The scheduling are retrieved from a Real time DataBase (Firebase) by Json objcet     */
 /*                                                                                      */
@@ -38,7 +39,10 @@ long* minute = 0;
 long* time = 0;
 /* Define pin */
 int pinLed        = 13;
+int pinLedReset   = 12;
 int valve         =  4;
+int pinButtonReset = 7;
+int buttonState = 0;
 int statusLed     = LOW;
 
 void setup() {
@@ -53,7 +57,10 @@ void setup() {
   
   /* Configuration I/0 */
   pinMode(pinLed, OUTPUT);
+  pinMode(pinButtonReset, INPUT);
   pinMode(valve, OUTPUT);
+  pinMode(pinButtonReset, INPUT);
+  digitalWrite(pinButtonReset, HIGH);
   
   /* Turn Off the valve */
   closeValve();
@@ -63,8 +70,12 @@ void setup() {
 }
 
 void refreshScheduling() {
+  
+  lastMinute = "MM";
+  
   Serial.println();
   Serial.println("--> Refresh of Scheduling <--");
+  digitalWrite(pinLedReset, HIGH);
 /***************************************************/
 /* 1. curl to identify the lenght of Json response */
 /***************************************************/
@@ -158,90 +169,97 @@ void refreshScheduling() {
     Serial.println(" sec.");
     z++;
   }
-  Serial.println("  3. Wait 10sec.");
-  delay(10000);
+  Serial.println("  3. Wait 2sec.");
+  delay(2000);
   Serial.println("  4. Finish Wait.");
+  digitalWrite(pinLedReset, LOW);
   Serial.println("--> Refresh of Scheduling Complete <--");
   Serial.println();
 }
 
 void loop() {
-  Process date;
-  int hours, minutes, seconds;
-  int lastSecond = -1;
-  date.begin("date");
-  date.addParameter("+%T");
-  date.run();
-  if(date.available()>0) {
-    String timeString = date.readString();
-    int firstColon = timeString.indexOf(":");
-    int secondColon= timeString.lastIndexOf(":");
-    String hourString = timeString.substring(0, firstColon); 
-    String minString = timeString.substring(firstColon+1, secondColon);
-    String secString = timeString.substring(secondColon+1);
-    if(minString.equals(lastMinute)) {
-    /* Check if the control of scheduling has been already performed for this hour (HH:MM) */
-      //Serial.print("It's the same minute (MM-> ");
-      //Serial.print(lastMinute);
-      //Serial.println("). Wait 10 sec.");
-      delay(10000);
-    } else {
-      Serial.print("--> Check at: ");
-      Serial.print(hourString);
-      Serial.print(":");
-      Serial.println(minString);
-      if(hourString.equals("00") && minString.equals("00") ) {
-        /* If it's midnight, recalculate the list of scheduling */
-        Serial.println("  It's midnight. Recalculare the Scheduling!");
-        refreshScheduling();
+  buttonState = digitalRead(pinButtonReset);  // read input buttonResetSchedule
+  /* Check if the reset button is pressed. */
+  if (buttonState != HIGH) {
+    refreshScheduling();
+  } else {
+    Process date;
+    int hours, minutes, seconds;
+    int lastSecond = -1;
+    date.begin("date");
+    date.addParameter("+%T");
+    date.run();
+    if(date.available()>0) {
+      String timeString = date.readString();
+      int firstColon = timeString.indexOf(":");
+      int secondColon= timeString.lastIndexOf(":");
+      String hourString = timeString.substring(0, firstColon); 
+      String minString = timeString.substring(firstColon+1, secondColon);
+      String secString = timeString.substring(secondColon+1);
+      if(minString.equals(lastMinute)) {
+      /* Check if the control of scheduling has been already performed for this hour (HH:MM) */
+        //Serial.print("It's the same minute (MM-> ");
+        //Serial.print(lastMinute);
+        //Serial.println("). Wait 10 sec.");
+        delay(1000);
       } else {
-        /* Check if a scheduling had to start. */
-        /* If more than one schedule start, the longer wins. So the duration (sec) is simply calulated with the longest one */
-        boolean startIrrigation = false;
-        long    duration = 0;
-        for (int i = 0; i < sizeof(hour); i++){
-          ///Serial.print("Schedule");
-          //Serial.print(i);
-          //Serial.print(": ");
-          //Serial.print(String(hour[i]));
-          //Serial.print(":");
-          //Serial.println(String(minute[i]));
-          String hourScheduling = String(hour[i]);
-          String minuteScheduling = String(minute[i]);
-          String valueZero = "0";
-          /* Fix on format of hour and minute */
-          if (hourScheduling.length() == 1) {
-            valueZero.concat(hourScheduling);
-            hourScheduling = valueZero;
-          }
-          valueZero = "0";
-          if (minuteScheduling.length() == 1) {
-            valueZero.concat(minuteScheduling);
-            minuteScheduling = valueZero;
-          }
-          if(hourString.equals(hourScheduling) && minString.equals(minuteScheduling) ) {
-            startIrrigation = true;
-            if(time[i] > duration) {
-              duration = time[i];
+        Serial.print("--> Check at: ");
+        Serial.print(hourString);
+        Serial.print(":");
+        Serial.println(minString);
+        if(hourString.equals("00") && minString.equals("00") ) {
+          /* If it's midnight, recalculate the list of scheduling */
+          Serial.println("  It's midnight. Recalculare the Scheduling!");
+          refreshScheduling();
+        } else {
+          /* Check if a scheduling had to start. */
+          /* If more than one schedule start, the longer wins. So the duration (sec) is simply calulated with the longest one */
+          boolean startIrrigation = false;
+          long    duration = 0;
+          for (int i = 0; i < sizeof(hour); i++){
+            ///Serial.print("Schedule");
+            //Serial.print(i);
+            //Serial.print(": ");
+            //Serial.print(String(hour[i]));
+            //Serial.print(":");
+            //Serial.println(String(minute[i]));
+            String hourScheduling = String(hour[i]);
+            String minuteScheduling = String(minute[i]);
+            String valueZero = "0";
+            /* Fix on format of hour and minute */
+            if (hourScheduling.length() == 1) {
+              valueZero.concat(hourScheduling);
+              hourScheduling = valueZero;
+            }
+            valueZero = "0";
+            if (minuteScheduling.length() == 1) {
+              valueZero.concat(minuteScheduling);
+              minuteScheduling = valueZero;
+            }
+            if(hourString.equals(hourScheduling) && minString.equals(minuteScheduling) ) {
+              startIrrigation = true;
+              if(time[i] > duration) {
+                duration = time[i];
+              }
             }
           }
-        }
-        if(startIrrigation) {
-          Serial.print("  Start Irrigation for ");
-          Serial.print(duration);
-          Serial.println(" sec. !");
-          openValve();
-          delay(duration*1000);
-          closeValve();
-        } else {
-          Serial.println("  No irrigation scheduled for this time.");
-          delay(10000);
+          if(startIrrigation) {
+            Serial.print("  Start Irrigation for ");
+            Serial.print(duration);
+            Serial.println(" sec. !");
+            openValve();
+            delay(duration*1000);
+            closeValve();
+          } else {
+            Serial.println("  No irrigation scheduled for this time.");
+            delay(10000);
+          }
         }
       }
+      lastMinute = minString;
+    } else {
+      Serial.println("WARNING! Hour is not available.");
     }
-    lastMinute = minString;
-  } else {
-    Serial.println("WARNING! Hour is not available.");
   }
 }
 

@@ -182,10 +182,9 @@ void refreshScheduling() {
 
 void loop() {
   buttonState = digitalRead(pinButtonReset);  // read input buttonResetSchedule
+  /* Check if the reset button is pressed. */
   if (buttonState != HIGH) {
-    
     refreshScheduling();
-    
   } else {
     Process date;
     int hours, minutes, seconds;

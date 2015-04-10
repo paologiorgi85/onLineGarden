@@ -11,18 +11,21 @@ We start with simple examples and my expectations are to grow up and realize a c
 
 ### What is this repository for? ###
 
-The project are composed by:
-
-* Web-Service based on a Firebase Real Time DataBase (it contain all the scheduling)
-* Web-App that permit to add and remove scheduling
-* Arduino sketchs that help you to retrieve the scheduling and start the irrigation
-
 The Arduino sketch are:
 
 1. button: start the irrigation with a button plugged in the Arduino board.
 2. jsonPrint: retrieve and print the Json stored on Firebase.
 3. scheduling: retrieve and start the irrigation using the scheduling stored on Firebase.
 4. improvements: add some improves to the sketch, like reset button, double water valve, etc...
+
+Sketchs number 2, 3 and 4 nead a Real Time DataBase (Firebase).
+To create and manage this DataBase I created a simple Web Application with AngulaJS (folder "web_app").
+
+I provide: 
+ * Test istance of Firebase: https://luminous-heat-4517.firebaseio.com/
+ * Web App: http://gardenduino.altervista.org/app/index.html
+
+No login are required for this two resources. Use it only as example.
 
 ### How do I get set up? ###
 

@@ -1,0 +1,43 @@
+<div class="jumbotron" id="MyApp" ng-controller="MainCtrl">
+  
+<!--
+  <p class="lead">
+    <img src="images/yeoman.png" alt="I'm Yeoman"><br>
+  </p>
+-->
+  <div align='left' id="AddItem">
+    <h3>Add Item</h3>
+
+    <input value="" type="text" placeholder="Name of Schedule" ng-model="itemName" >
+    <br/><br/>
+    <input value="17" type="number" placeholder="Hour" ng-model="itemHour" size="2">
+    : <input value="0" type="number" placeholder="Minute" ng-model="itemMinute" size="2">
+    &nbsp For &nbsp<input value="20" type="number" placeholder="Time" ng-model="itemTime" size="4">
+    &nbsp sec.
+    <br/><br/>
+    <button ng-click="addItem()">Add to list</button>
+    &nbsp
+    <button ng-click="openValve()">Open Valve</button>
+    &nbsp
+    <button ng-click="closeValve()">Close Valve</button>
+  </div>
+    <!-- begin: LIST OF UNCHECKED ITEMS -->
+    <div id="UncheckedList">
+      <h3>List of Scheduled irrigations:</h3>
+      <table>
+        <tr ng-repeat="(key,item) in items" class="item-unchecked">
+          <td align="left"> - {{item.name}} </td>
+          <td><b> &nbsp start at &nbsp </b> </td> <td align="right"> {{item.hour}} </td>
+          <td><b>:</b></td><td align="left"> {{item.minute}} </td>
+          <td align="left"><b>&nbsp for &nbsp</b> </td><td align="right">{{item.time}} <b> sec </b> &nbsp</td>
+          <td>
+          <button ng-click="remove(key)"> Remove </button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  <!-- end: LIST OF ITEMS -->
+  </div>
+<div class="row marketing">
+
+</div>

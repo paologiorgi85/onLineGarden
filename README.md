@@ -18,7 +18,7 @@ The Arduino sketch are:
 3. scheduling: retrieve and start the irrigation using the scheduling stored on Firebase.
 4. improvements: add some improves to the sketch, like reset button, double water valve, etc...
 
-Sketchs number 2, 3 and 4 nead a Real Time DataBase (Firebase).
+Sketchs number 2, 3 and 4 need a Real Time DataBase (Firebase).
 To create and manage this DataBase I created a simple Web Application with AngulaJS (folder "web_app").
 
 I provide: 

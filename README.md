@@ -33,10 +33,10 @@ Start from the first example and proceed with the next.
 Copy the folder into your Arduino library and start to modify and contribute to the Repo.
 Into each folder there are a sketch and all the schema, realized with Fritzing, to reproduce the circuit.
 
-The understanding is easy and there are many ways to improve these sketchs.
+The understanding is easy and there are many ways to improve these sketches.
 
 I design the circuit with Fritzing.
-Construct the circuit with the example images present into the folter "prototypes_Fritzing".
+Construct the circuit with the example images present into the folder "prototypes_Fritzing".
 
 ### Contribution guidelines ###
 

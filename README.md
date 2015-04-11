@@ -19,10 +19,7 @@ The Arduino sketch are:
 4. improvements: add some improves to the sketch, like reset button, double water valve, etc...
 
 Sketchs number 2, 3 and 4 need a Real Time DataBase (Firebase).
-To create and manage this DataBase I created a simple Web Application with AngulaJS (folder "web_app").
-
-I provide: 
- * Test istance of Firebase: https://luminous-heat-4517.firebaseio.com/
+To create and manage this DataBase I created a simple Web Application with AngulaJS (folder "web_app") that I deployed at: 
  * Web App: http://gardenduino.altervista.org/app/index.html
 
 No login are required for this two resources. Use it only as example.

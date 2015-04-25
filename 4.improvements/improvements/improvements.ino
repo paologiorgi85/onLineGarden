@@ -178,6 +178,14 @@ void refreshScheduling() {
   digitalWrite(pinLedReset, LOW);
   Serial.println("--> Refresh of Scheduling Complete <--");
   Serial.println();
+  
+/***********************************/
+/* 5. update the last refresh date */
+/***********************************/
+//  Process p2;
+//  p.runShellCommand( curl -k POST baseio.com/last_refresh.json -d "{\"value\":\"hello\"}");
+//  curl -k POST baseio.com/last_refresh.json -d "{\"value\":\"hello\"}"
+//  curl -k https://luminous-heat-4517.firebaseio.com/last_refresh.json
 }
 
 void loop() {

@@ -57,6 +57,7 @@ void setup() {
   
   /* Configuration I/0 */
   pinMode(pinLed, OUTPUT);
+  pinMode(pinLedReset,OUTPUT);
   pinMode(pinButtonReset, INPUT);
   pinMode(valve, OUTPUT);
   pinMode(pinButtonReset, INPUT);

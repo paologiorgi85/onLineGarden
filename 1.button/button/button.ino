@@ -16,9 +16,9 @@
 YunServer server;
 
 /* Define pin and variables */
-int pinLed        = 13;
+int pinLed        = 12;
 int valve         =  4;
-int botton        =  7;
+int botton        =  5;
 int statusLed     = LOW;
 
 void setup() {
@@ -47,14 +47,12 @@ void loop() {
   int readButtonValue = digitalRead(botton);   
   if (readButtonValue == 1) {
     /* Managed by fisical button */
-     if (statusLed == LOW) {
-       statusLed=HIGH;
-       openValve();  
-     } else {
-       statusLed=LOW;
-       closeValve();
-     }
-     delay(1000);
+    openValve();
+    while (digitalRead(botton) == 1) {
+      delay(500);
+    }
+    closeValve();
+    delay(1000);
   } else {
     /* Managed by Web */
     /* Get clients coming from server */

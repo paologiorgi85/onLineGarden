@@ -38,12 +38,13 @@ long* hour = 0;
 long* minute = 0;
 long* time = 0;
 /* Define pin */
-int pinLed        = 13;
-int pinLedReset   = 12;
-int valve         =  4;
-int pinButtonReset = 7;
-int buttonState = 0;
-int statusLed     = LOW;
+int pinLed          = 12;
+int pinLedReset     = 13;
+int valve           =  4;
+int pinButtonStart  =  5;
+int pinButtonReset   = 7;
+int buttonState     = 0;
+int buttonStart     = 0;
 
 void setup() {
   /* Initialize Bridge */
@@ -58,6 +59,7 @@ void setup() {
   /* Configuration I/0 */
   pinMode(pinLed, OUTPUT);
   pinMode(pinLedReset,OUTPUT);
+  pinMode(pinButtonStart, INPUT);
   pinMode(pinButtonReset, INPUT);
   pinMode(valve, OUTPUT);
   pinMode(pinButtonReset, INPUT);
@@ -180,9 +182,19 @@ void refreshScheduling() {
 
 void loop() {
   buttonState = digitalRead(pinButtonReset);  // read input buttonResetSchedule
+  buttonStart = digitalRead(pinButtonStart);  // read input pinButtonStart
+  
   /* Check if the reset button is pressed. */
-  if (buttonState != HIGH) {
+  if (buttonState == HIGH) {
     refreshScheduling();
+  } else if (buttonStart == 1) {
+    /* Manage by fisical button */
+    openValve();
+    while (digitalRead(pinButtonStart) == 1) {
+      delay(500);
+    }
+    closeValve();
+    delay(1000);
   } else {
     Process date;
     int hours, minutes, seconds;
@@ -202,7 +214,7 @@ void loop() {
         //Serial.print("It's the same minute (MM-> ");
         //Serial.print(lastMinute);
         //Serial.println("). Wait 10 sec.");
-        delay(1000);
+        delay(500);
       } else {
         Serial.print("--> Check at: ");
         Serial.print(hourString);
@@ -253,7 +265,7 @@ void loop() {
             closeValve();
           } else {
             Serial.println("  No irrigation scheduled for this time.");
-            delay(10000);
+            delay(500);
           }
         }
       }

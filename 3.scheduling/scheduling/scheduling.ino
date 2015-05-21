@@ -194,7 +194,7 @@ void loop() {
       delay(500);
     }
     closeValve();
-    delay(1000);
+    delay(500);
   } else {
     Process date;
     int hours, minutes, seconds;

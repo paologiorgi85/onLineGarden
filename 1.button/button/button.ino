@@ -38,7 +38,7 @@ void setup() {
   pinMode(botton, INPUT);
   
   /* Turn Off the valve */
-  Serial.print("Setup operation");
+  Serial.println("Setup operation");
   closeValve();
 }
   
@@ -75,13 +75,13 @@ void loop() {
 void openValve() {
   digitalWrite(pinLed, HIGH);
   digitalWrite(valve, HIGH);
-  Serial.print("Open valve");
+  Serial.println("Open valve");
 }
 
 void closeValve() {
   digitalWrite(pinLed, LOW);
   digitalWrite(valve, LOW);
-  Serial.print("Close valve");
+  Serial.println("Close valve");
 }
       
 /* Process incoming command */

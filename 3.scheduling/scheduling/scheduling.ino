@@ -229,13 +229,16 @@ void loop() {
           /* If more than one schedule start, the longer wins. So the duration (sec) is simply calulated with the longest one */
           boolean startIrrigation = false;
           long    duration = 0;
-          for (int i = 0; i < sizeof(hour); i++){
-            ///Serial.print("Schedule");
-            //Serial.print(i);
-            //Serial.print(": ");
-            //Serial.print(String(hour[i]));
-            //Serial.print(":");
-            //Serial.println(String(minute[i]));
+          
+          for (int i = 0; i < numOfScheduling; i++){
+ /*
+            Serial.print("Schedule");
+            Serial.print(i);
+            Serial.print(": ");
+            Serial.print(String(hour[i]));
+            Serial.print(":");
+            Serial.println(String(minute[i]));
+*/
             String hourScheduling = String(hour[i]);
             String minuteScheduling = String(minute[i]);
             String valueZero = "0";
@@ -249,6 +252,17 @@ void loop() {
               valueZero.concat(minuteScheduling);
               minuteScheduling = valueZero;
             }
+/*
+            Serial.print("Check: ");
+            Serial.print(hourString);
+            Serial.print(" - ");
+            Serial.print(minString);
+            Serial.print(" Vs. ");
+            Serial.print(hourScheduling);
+            Serial.print(" - ");
+            Serial.print(minuteScheduling);
+            Serial.println(" ");
+*/
             if(hourString.equals(hourScheduling) && minString.equals(minuteScheduling) ) {
               startIrrigation = true;
               if(time[i] > duration) {

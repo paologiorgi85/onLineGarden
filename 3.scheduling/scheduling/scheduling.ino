@@ -129,7 +129,7 @@ void refreshScheduling() {
 /********************************/
 /* 4. analyse the json response */
 /********************************/
-  StaticJsonBuffer<200> jsonBuffer;
+  StaticJsonBuffer<300> jsonBuffer;
   JsonObject& root = jsonBuffer.parseObject(json);
   /* json example: {"first":{"hour":9,"minute":20,"name":"first","time":60},"second":{"hour":10,"minute":30,"name":"second","time":30}} */
   

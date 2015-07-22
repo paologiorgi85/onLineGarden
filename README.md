@@ -9,6 +9,8 @@ We start with simple examples and my expectations are to grow up and realize a c
 * easy to use
 * customizable
 
+[onLineGarden Slide](https://docs.google.com/presentation/d/1dldk3AKztofr2o9tXoQ7PVboTCMv4xLuLLhNsQ0M11g/edit?usp=sharing)
+
 ### What is this repository for? ###
 
 The Arduino sketch are:

@@ -13,7 +13,7 @@ Here a simple and easy to understand explanation of the project: [onLineGarden S
 
 ### What is this repository for? ###
 
-The Arduino sketch are:
+The Arduino sketches are:
 
 1. button: start the irrigation with a button plugged in the Arduino board.
 2. jsonPrint: retrieve and print the Json stored on Firebase.
